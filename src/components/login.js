@@ -1,5 +1,50 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2"; 
+
 const Login = () =>{
-    const[email,setEmail] = useState
+    const[email,setEmail] = useState('');
+    const[password,setPassword] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(()=>{
+        const login = localStorage.getItem('dataLoginAdmin');
+        if(login > 0){
+            navigate('/list-video-admin');
+        }else{
+            navigate('/login-admin');
+        }    
+    },[]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const dataSend = {
+            email,
+            password
+        }
+        if(email === '' || password === ''){
+            Swal("failed","login Gagal","error");
+        }else{
+            fetch(`${process.env.REACT_APP_API}/loginAdmin`,{
+                method:'POST',
+                body: JSON.stringify(dataSend),
+                headers:{
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(hasil => {
+                console.log(hasil);
+                localStorage.setItem('dataLoginAdmin',hasil.token);
+               navigate('/list-video-admin');
+            })
+            .catch(err =>{
+                alert(err)
+            })
+            
+        }
+    }
+
     return(
         <>
         <div className="container image-bg">
@@ -26,7 +71,7 @@ const Login = () =>{
                                         <i className="fas fa-user"></i>
                                     </span>
                                 </div>
-                                <input type="text" className="form-control" placeholder="username"/>
+                                <input onChange={(e) => setEmail(e.target.value)} type="email" className="form-control" placeholder="email"/>
                             </div>
 
                             <div className="input-group form-group">
@@ -35,11 +80,11 @@ const Login = () =>{
                                         <i className="fas fa-key"></i>
                                     </span>
                                 </div>
-                                <input type="password" className="form-control" placeholder="password"/>
+                                <input onChange={(e) => setPassword(e.target.value)} type="password" className="form-control" placeholder="password"/>
                             </div>
 
                             <div className="form-group">
-                                <button className="btn float-right login-btn">Login</button>
+                                <button onClick={(e) => handleSubmit(e)} className="btn float-right login-btn">Login</button>
                             </div>
                             
                         </form>
