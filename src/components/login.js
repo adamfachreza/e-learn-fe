@@ -6,6 +6,7 @@ const Login = () =>{
     const[email,setEmail] = useState('');
     const[password,setPassword] = useState('');
     const navigate = useNavigate();
+    
 
     useEffect(()=>{
         const login = localStorage.getItem('dataLoginAdmin');
@@ -13,8 +14,8 @@ const Login = () =>{
             navigate('/list-video-admin');
         }else{
             navigate('/login-admin');
-        }    
-    },[]);
+        }
+    },[])
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -41,10 +42,8 @@ const Login = () =>{
             .catch(err =>{
                 alert(err)
             })
-            
         }
     }
-
     return(
         <>
         <div className="container image-bg">

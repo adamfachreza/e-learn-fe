@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react";
-
+import {Modal, Button} from 'react-bootstrap';
+import ReactPlayer from "react-player/lazy";
 const ListVideoAdmin = () => {
     const [dataListVideo, setDataListVideo] = useState([]);
+    const [handleShowVideo, setHandleShowVideo] = useState(false);
+    const [linkVideo, setLinkVideo] = useState('');
+    const [lgShow, setLgShow] = useState(false);
+    const [judul, setJudul] = useState('');
+    const [keterangan, setKeterangan] = useState('');
+    const [link_thumbnail, setLinkThumbnail] = useState('');
+    const [link_video, setSaveLinkVideo] = useState('');
+    
+    const handleClose = () => {
+        setHandleShowVideo(false)
+    }
     useEffect(()=>{
         getData()
     },[]) // biar g muncul terus pas di tambahin array kosong
@@ -28,27 +40,107 @@ const ListVideoAdmin = () => {
         })
         .catch(err => {
             alert(err)
-        })
+        });
+    };
+
+    const handleOpenVideo = (data)=>{
+        setHandleShowVideo(true)
+        setLinkVideo(data.link_video)
     }
     return(
         <>
+        {/* {modal play} */}
+        <Modal
+        show={handleShowVideo}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Modal title</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <div className="h-auto">   
+         {
+            <>
+                <ReactPlayer
+                pip={true}
+                config={{
+                    youtube:{
+                        playerVars:{
+                            showinfo: 1,
+                            origin: window.location.origin,
+                        },
+                    },
+                }}
+                width="100%"
+                height="300px"
+                controls={true}
+                url={`${linkVideo}`}
+                />
+            </>
+         }
+            </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary">Understood</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* modal tambah video */}
+      <Modal
+        size="lg"
+        show={lgShow}
+        onHide={() => setLgShow(false)}
+        aria-labelledby="example-modal-sizes-title-lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="example-modal-sizes-title-lg">
+            Large Modal
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <form>
+                <div className="form-group">
+                    <label htmlFor="judul">Judul</label>
+                    <input type="text" name="judul" value={judul} className="form-control" placeholder="Judul" onChange={(e) => setJudul(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="keterangan">Keterangan</label>
+                    <input type="text" name="keterangan" value={keterangan} className="form-control" placeholder="Keterangan" onChange={(e) => setKeterangan(e.target.value)}/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="link_thumbnail">link_thumbnail</label>
+                    <input type="text" name="link_thumbnail" value={link_thumbnail} className="form-control" placeholder="Link Thumbnail" onChange={(e) => setLinkThumbnail(e.target.value)}/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="link_video">link_video</label>
+                    <input type="text" name="link_video" value={link_video} className="form-control" placeholder="Link Video" onChange={(e) => setSaveLinkVideo(e.target.value)} />
+                </div>
+                <button className="btn brn-primary">Simpan</button>
+            </form>
+        </Modal.Body>
+      </Modal>
         <div className="jumbotron">
             <h1 className="display-4">Hello, world!</h1>
             <p className="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
             <hr className="my-4" />
             <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
             <p className="lead">
-                <a className="btn btn-primary btn-lg" href="/" role="button">Learn more</a>
+                <button className="btn btn-primary btn-lg" onClick={() => setLgShow(true)}> + Tambah Video</button>
             </p>
         </div>
 
         <div className="row justify-content-center">
             {
                 dataListVideo.map((data , index) => {
-                    console.log(data)
                     return(
                         <div key={index} className="card m-3 col-md-4 col-lg" style={{width: '18rem', height: 'auto', border:'none'}}>
-                        <img className="card-img-top" src={data.link_thumbnail} alt="thumbnail" />
+                        <img onClick={() => handleOpenVideo(data)}
+                        className="card-img-top" src={data.link_thumbnail} alt="thumbnail" />
                         <div className="card-body">
                             <h5 className="card-title">{data.judul}</h5>
                             <p className="card-text">{data.keterangan}</p>
@@ -58,8 +150,6 @@ const ListVideoAdmin = () => {
                     )
                 })
             }
-            
-            
         </div>
        
         </>
