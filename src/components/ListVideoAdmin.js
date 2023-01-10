@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {Modal, Button} from 'react-bootstrap';
 import ReactPlayer from "react-player/lazy";
+import Swal from 'sweetalert2'
+
 const ListVideoAdmin = () => {
     const [dataListVideo, setDataListVideo] = useState([]);
     const [handleShowVideo, setHandleShowVideo] = useState(false);
@@ -11,6 +13,7 @@ const ListVideoAdmin = () => {
     const [link_thumbnail, setLinkThumbnail] = useState('');
     const [link_video, setSaveLinkVideo] = useState('');
     
+    
     const handleClose = () => {
         setHandleShowVideo(false)
     }
@@ -18,6 +21,7 @@ const ListVideoAdmin = () => {
         getData()
     },[]) // biar g muncul terus pas di tambahin array kosong
 
+    // Get Data Content
     const getData=()=>{
         const token = localStorage.getItem('dataLoginAdmin');
         const dataSend = {
@@ -43,10 +47,61 @@ const ListVideoAdmin = () => {
         });
     };
 
+    // Play video di modal
     const handleOpenVideo = (data)=>{
         setHandleShowVideo(true)
         setLinkVideo(data.link_video)
     }
+
+    // Clear State 
+    const clearState = () =>{
+        setJudul('');
+        setKeterangan('');
+        setLinkThumbnail('');
+        setSaveLinkVideo('');
+    }
+
+    // Simpan Content
+    const handleSimpan = (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('dataLoginAdmin');
+        const Swal = require('sweetalert2')
+        const dataSend ={
+            judul: judul,
+            keterangan: keterangan,
+            link_thumbnail: link_thumbnail,
+            link_video: link_video,
+            token: token,
+        }
+        if(judul === '' || keterangan === '' || link_thumbnail === '' || link_video === ''){
+            Swal.fire('Gagal', 'Form Harus Diisi Semua', 'error')
+              return;
+        }
+        fetch(`${process.env.REACT_APP_API}/tambahContent`,{
+            method: 'POST',
+            body: JSON.stringify(dataSend),
+            headers: {
+                'Content-Type' : 'application/json'
+            }
+        })
+        .then(res=> res.json())
+        .then(hasil => {
+            console.log('hasil =>', hasil);
+            setLgShow(false)
+            clearState();
+            if(hasil.status === 'berhasil'){
+                Swal.fire('success', hasil.message, 'success')
+                getData()
+            }else{
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                  })
+            }
+        })
+    }
+
     return(
         <>
         {/* {modal play} */}
@@ -113,17 +168,18 @@ const ListVideoAdmin = () => {
                     <input type="text" name="keterangan" value={keterangan} className="form-control" placeholder="Keterangan" onChange={(e) => setKeterangan(e.target.value)}/>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="link_thumbnail">link_thumbnail</label>
+                    <label htmlFor="link_thumbnail">Link Thumbnail</label>
                     <input type="text" name="link_thumbnail" value={link_thumbnail} className="form-control" placeholder="Link Thumbnail" onChange={(e) => setLinkThumbnail(e.target.value)}/>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="link_video">link_video</label>
+                    <label htmlFor="link_video">Link Video</label>
                     <input type="text" name="link_video" value={link_video} className="form-control" placeholder="Link Video" onChange={(e) => setSaveLinkVideo(e.target.value)} />
                 </div>
-                <button className="btn brn-primary">Simpan</button>
+                <button className="btn brn-primary" onClick={(e) => handleSimpan(e)}>Simpan</button>
             </form>
         </Modal.Body>
       </Modal>
+
         <div className="jumbotron">
             <h1 className="display-4">Hello, world!</h1>
             <p className="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
