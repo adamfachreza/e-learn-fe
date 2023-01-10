@@ -10,10 +10,8 @@ const Login = () =>{
 
     useEffect(()=>{
         const login = localStorage.getItem('dataLoginAdmin');
-        if(login > 0){
+        if(login){
             navigate('/list-video-admin');
-        }else{
-            navigate('/login-admin');
         }
     },[])
 
@@ -35,9 +33,11 @@ const Login = () =>{
             })
             .then(res => res.json())
             .then(hasil => {
-                console.log(hasil);
-                localStorage.setItem('dataLoginAdmin',hasil.token);
-               navigate('/list-video-admin');
+                if(hasil.status === 'berhasil'){
+                    localStorage.setItem('dataLoginAdmin',hasil.token);
+                    navigate('/list-video-admin');
+                }
+                
             })
             .catch(err =>{
                 alert(err)
