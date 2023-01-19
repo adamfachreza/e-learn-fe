@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import ReactPlayer from "react-player/lazy";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
+import NavbarComponent from "./NavbarComponents";
 
 
 const ListVideoAdmin = () => {
+  const Swal = require("sweetalert2");
   const navigate = useNavigate();
   // list video
   const [dataListVideo, setDataListVideo] = useState([]);
@@ -92,7 +94,6 @@ const ListVideoAdmin = () => {
   const handleSimpan = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("dataLoginAdmin");
-    const Swal = require("sweetalert2");
     const dataSend = {
       judul: judul,
       keterangan: keterangan,
@@ -173,7 +174,7 @@ const ListVideoAdmin = () => {
   const handleUpdateSimpan = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("dataLoginAdmin");
-    const Swal = require("sweetalert2");
+  
     const dataSend = {
       id: idUpdate,
       judul: judul,
@@ -403,9 +404,8 @@ const ListVideoAdmin = () => {
         </Modal.Body>
       </Modal>
 
-   
-
     <Container>
+      <NavbarComponent />
       <div className="jumbotron">
         <h1 className="display-4">Hello Ini Halaman Content Admin!</h1>
         <p className="lead">
